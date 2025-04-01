@@ -26,7 +26,7 @@ jobs:
       
       - name: Set AKS context
         run: |
-          az aks get-credentials --resource-group <votre-resource-group> --name <votre-cluster-name>
+          az aks get-credentials --resource-group plop-new --name ip-app-default
       
       - name: Install Helm
         uses: azure/setup-helm@v3
