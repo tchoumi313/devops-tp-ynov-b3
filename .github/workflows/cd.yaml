@@ -44,8 +44,8 @@ jobs:
       - name: Deploy application
         run: |
           # Mettre à jour l'image dans values.yaml avec le tag spécifique
-          sed -i "s|repository: .*|repository: ${{ secrets.DOCKERHUB_USERNAME }}/flask-my-ip-app|g" flask-app-chart/flask-app/values.yaml
-          sed -i "s|tag: .*|tag: \"latest\"|g" flask-app-chart/flask-app/values.yaml
+          sed -i "s|repository: .*|repository: ${{ secrets.DOCKERHUB_USERNAME }}/flask-my-ip-app|g" flask-app/values.yaml
+          sed -i "s|tag: .*|tag: \"latest\"|g" flask-app/values.yaml
           
           # Déployer l'application avec Helm
-          helm upgrade --install flask-application ./flask-app-chart/flask-app
+          helm upgrade --install flask-application ./flask-app
