@@ -30,12 +30,25 @@ jobs:
     #     with:
     #       client-id: ${{ secrets.AZURE_CLIENT_ID }}
     #       tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-    #       subscription-id: '7f392766-73b8-4ab2-98c9-3a24ca1207ea'
+    #       subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       
     #   - name: Set AKS context
     #     run: |
     #       az aks get-credentials --resource-group plop-new --name ip-app-default
-      
+      - name: Azure Login action
+        uses: azure/login@v2
+        with:
+         creds: ${{ secrets.AZURE_CREDENTIALS }}
+         enable-AzPSSession: true
+     
+      - name: Azure CLI script
+        uses: azure/cli@v2
+        with:
+         azcliversion: latest
+         inlineScript: |
+            az aks get-credentials --resource-group plop-new --name ip-app-default
+
+
       - name: Install Helm
         uses: azure/setup-helm@v3
         with:
@@ -49,3 +62,6 @@ jobs:
           
           # Déployer l'application avec Helm
           helm upgrade --install flask-application ./flask-app
+
+
+    
