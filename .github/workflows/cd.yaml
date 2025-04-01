@@ -1,0 +1,43 @@
+name: CD Pipeline
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install Azure CLI
+        run: |
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+      
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Set AKS context
+        run: |
+          az aks get-credentials --resource-group <votre-resource-group> --name <votre-cluster-name>
+      
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'latest'
+      
+      - name: Deploy application
+        run: |
+          # Mettre à jour l'image dans values.yaml avec le tag spécifique
+          sed -i "s|repository: .*|repository: ${{ secrets.DOCKERHUB_USERNAME }}/flask-my-ip-app|g" flask-app-chart/flask-app/values.yaml
+          sed -i "s|tag: .*|tag: \"latest\"|g" flask-app-chart/flask-app/values.yaml
+          
+          # Déployer l'application avec Helm
+          helm upgrade --install flask-application ./flask-app-chart/flask-app
