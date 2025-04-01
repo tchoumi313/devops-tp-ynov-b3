@@ -31,14 +31,7 @@ jobs:
       - name: Security check with bandit
         run: |
           bandit -r src/ --severity-level high
-      - name: Docker Scout
-        uses: docker/scout-action@v1
-        with:
-          dockerhub-user: ${{ secrets.DOCKERHUB_USERNAME }}
-          dockerhub-password: ${{ secrets.DOCKERHUB_TOKEN }}
-          command: cves
-          image: ${{ secrets.DOCKERHUB_USERNAME }}/voting-app:latest
-
+      
   build:
     needs: test
     runs-on: ubuntu-latest
@@ -59,3 +52,14 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/flask-my-ip-app:latest
+
+      - name: Docker Scout
+        uses: docker/scout-action@v1
+        with:
+          dockerhub-user: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-password: ${{ secrets.DOCKERHUB_TOKEN }}
+          command: cves
+          image: ${{ secrets.DOCKERHUB_USERNAME }}/flask-my-ip-app:latest
+          only-severities: critical,high
+          sarif-file: scout-results.sarif
+          github-token: ${{ secrets.GITHUB_TOKEN }}
